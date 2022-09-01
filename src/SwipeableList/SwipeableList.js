@@ -1,19 +1,29 @@
-import React, { Component } from "react";
+import React from "react";
 import "./SwipeableList.css";
 
-class SwipeableList extends Component {
-  render() {
-    const { children } = this.props;
+const SwipeableList = ({ children, background }) => {
+  let isDragging = false;
 
-    const childrenWithProps = React.Children.map(children, child => {
-      if (!child.props.background) {
-        return React.cloneElement(child, { background: this.props.background });
-      }
-      return child;
-    });
+  const onSwipe = (evt) => {
+    if (evt === "start") {
+      isDragging = true;
+    } else {
+      isDragging = false;
+    }
+    console.log("onSwipe", isDragging);
+  };
+  const childrenWithProps = React.Children.map(children, (child) => {
+    if (!child.props.background) {
+      return React.cloneElement(child, { background, isDragging, onSwipe });
+    }
+    return child;
+  });
 
-    return <div className="List">{childrenWithProps}</div>;
-  }
-}
+  return (
+    <div className="List" name="list-swipe">
+      {childrenWithProps}
+    </div>
+  );
+};
 
 export default SwipeableList;

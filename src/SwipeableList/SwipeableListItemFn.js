@@ -1,18 +1,18 @@
 import "./SwipeableListItem.css";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
 const SwipeableListItemFn = (props) => {
-  // DOM Refs
-  let listElement = null,
-    wrapper = null,
-    background = null,
-    // Drag & Drop
+  let // Drag & Drop
     dragStartX = 0,
     left = 0,
     dragged = false,
     // FPS Limit
     startTime,
     fpsInterval = 1000 / 60;
+  // Dom refs
+  const listElement = useRef(null);
+  const wrapper = useRef(null);
+  const background = useRef(null);
 
   useEffect(() => {
     window.addEventListener("mouseup", onDragEndMouse);
@@ -25,20 +25,27 @@ const SwipeableListItemFn = (props) => {
   }, []);
 
   const onDragStartMouse = (evt) => {
-    onDragStart(evt.clientX);
-    window.addEventListener("mousemove", onMouseMove);
+    if (!props.isDragging) {
+      onDragStart(evt.clientX);
+      window.addEventListener("mousemove", onMouseMove);
+    }
   };
 
   const onDragStartTouch = (evt) => {
-    const touch = evt.targetTouches[0];
-    onDragStart(touch.clientX);
-    window.addEventListener("touchmove", onTouchMove);
+    if (!props.isDragging) {
+      props.onSwipe("start");
+      const touch = evt.targetTouches[0];
+      onDragStart(touch.clientX);
+      window.addEventListener("touchmove", onTouchMove);
+    }
   };
 
   const onDragStart = (clientX) => {
+    const list = document.getElementsByName("list-swipe")[0];
+    list.style.position = "fixed";
     dragged = true;
     dragStartX = clientX;
-    listElement.className = "ListItem";
+    listElement.current.className = "ListItem";
     startTime = Date.now();
     requestAnimationFrame(updatePosition);
   };
@@ -55,18 +62,21 @@ const SwipeableListItemFn = (props) => {
 
   const onDragEnd = () => {
     if (dragged) {
+      const list = document.getElementsByName("list-swipe")[0];
+      list.style.position = "inherit";
+
       dragged = false;
       const threshold = props.threshold || 0.3;
-      if (Math.abs(left) > Math.abs(listElement.offsetWidth * threshold)) {
-        left = 2 * left < 0 ? -listElement.offsetWidth : listElement.offsetWidth;
-        wrapper.style.maxHeight = 0;
+      if (Math.abs(left) > Math.abs(listElement.current.offsetWidth * threshold)) {
+        left = 2 * left < 0 ? -listElement.current.offsetWidth : listElement.current.offsetWidth;
+        wrapper.current.style.maxHeight = 0;
         onSwiped();
       } else {
         left = 0;
       }
 
-      listElement.className = "BouncingListItem";
-      listElement.style.transform = `translateX(${left}px)`;
+      listElement.current.className = "BouncingListItem";
+      listElement.current.style.transform = `translateX(${left}px)`;
     }
   };
 
@@ -90,14 +100,14 @@ const SwipeableListItemFn = (props) => {
     const elapsed = now - startTime;
 
     if (dragged && elapsed > fpsInterval) {
-      listElement.style.transform = `translateX(${left}px)`;
+      listElement.current.style.transform = `translateX(${left}px)`;
 
       const opacity = (Math.abs(left) / 100).toFixed(2);
-      if (opacity < 1 && opacity.toString() !== background.style.opacity) {
-        background.style.opacity = opacity.toString();
+      if (opacity < 1 && opacity.toString() !== background.current.style.opacity) {
+        background.current.style.opacity = opacity.toString();
       }
       if (opacity >= 1) {
-        background.style.opacity = "1";
+        background.current.style.opacity = "1";
       }
 
       startTime = Date.now();
@@ -106,25 +116,25 @@ const SwipeableListItemFn = (props) => {
 
   const onClicked = () => {
     if (props.onSwipe) {
-      props.onSwipe();
+      props.onSwipe("clicked");
     }
   };
 
   const onSwiped = () => {
     if (props.onSwipe) {
-      props.onSwipe();
+      props.onSwipe("end");
     }
   };
 
   return (
     <>
-      <div className="Wrapper" ref={(div) => (wrapper = div)}>
-        <div ref={(div) => (background = div)} className="Background">
+      <div className="Wrapper" ref={wrapper}>
+        <div ref={background} className="Background">
           {props.background ? props.background : <span>Delete it</span>}
         </div>
         <div
           onClick={onClicked}
-          ref={(div) => (listElement = div)}
+          ref={listElement}
           onMouseDown={onDragStartMouse}
           onTouchStart={onDragStartTouch}
           className="ListItem"
