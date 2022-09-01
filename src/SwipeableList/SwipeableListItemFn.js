@@ -25,14 +25,12 @@ const SwipeableListItemFn = (props) => {
   }, []);
 
   const onDragStartMouse = (evt) => {
-    if (!props.isDragging) {
-      onDragStart(evt.clientX);
-      window.addEventListener("mousemove", onMouseMove);
-    }
+    onDragStart(evt.clientX);
+    window.addEventListener("mousemove", onMouseMove);
   };
 
   const onDragStartTouch = (evt) => {
-    if (!props.isDragging) {
+    if (evt.touches.length === 1) {
       props.onSwipe("start");
       const touch = evt.targetTouches[0];
       onDragStart(touch.clientX);
