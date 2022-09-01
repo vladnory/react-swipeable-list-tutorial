@@ -10,7 +10,6 @@ const SwipeableList = ({ children, background }) => {
     } else {
       isDragging = false;
     }
-    console.log("onSwipe", isDragging);
   };
   const childrenWithProps = React.Children.map(children, (child) => {
     if (!child.props.background) {
