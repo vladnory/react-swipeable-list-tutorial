@@ -110,7 +110,9 @@ class SwipeableListItem extends React.Component {
   }
 
   updatePosition() {
-    if (this.dragged) requestAnimationFrame(this.updatePosition);
+    if (this.dragged) {
+      requestAnimationFrame(this.updatePosition);
+    }
 
     const now = Date.now();
     const elapsed = now - this.startTime;
@@ -145,17 +147,13 @@ class SwipeableListItem extends React.Component {
   render() {
     return (
       <>
-        <div className="Wrapper" ref={div => (this.wrapper = div)}>
-          <div ref={div => (this.background = div)} className="Background">
-            {this.props.background ? (
-              this.props.background
-            ) : (
-              <span>Delete</span>
-            )}
+        <div className="Wrapper" ref={(div) => (this.wrapper = div)}>
+          <div ref={(div) => (this.background = div)} className="Background">
+            {this.props.background ? this.props.background : <span>Delete</span>}
           </div>
           <div
             onClick={this.onClicked}
-            ref={div => (this.listElement = div)}
+            ref={(div) => (this.listElement = div)}
             onMouseDown={this.onDragStartMouse}
             onTouchStart={this.onDragStartTouch}
             className="ListItem"

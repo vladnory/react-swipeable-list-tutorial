@@ -1,12 +1,17 @@
 import React, { Component } from "react";
-import SwipeableListItem from "./SwipeableList/SwipeableListItem";
+import SwipeableListItem from "./SwipeableList/SwipeableListItemFn";
 import SwipeableList from "./SwipeableList/SwipeableList";
 import "./App.css";
 
-const background = <span>Archive</span>;
+const background = (
+  <>
+    <span>Approve</span>
+    <span>Approve</span>
+  </>
+);
 const fakeContent = (
   <div className="FakeContent">
-    <span>Swipe to delete</span>
+    <span>Swipe to approve timecard</span>
   </div>
 );
 
